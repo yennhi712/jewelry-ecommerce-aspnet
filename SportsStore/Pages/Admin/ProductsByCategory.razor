@@ -1,0 +1,55 @@
+﻿@page "/admin/products/{CategoryID:long}"
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="mb-3">Sản phẩm thuộc phân loại: @CategoryName</h3>
+
+@if (Products?.Any() != true)
+{
+    <p class="text-muted">Chưa có sản phẩm nào trong phân loại này.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped table-sm align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Products)
+            {
+                <tr>
+                    <td>@p.ProductID</td>
+                    <td>@p.Name</td>
+                    <td>@p.Price.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<NavLink class="btn btn-secondary mt-3" href="/admin/categories">
+    <i class="bi bi-arrow-left-circle"></i> Quay lại phân loại
+</NavLink>
+
+@code {
+    [Parameter] public long CategoryID { get; set; }
+
+    public string CategoryName { get; set; } = string.Empty;
+    public IEnumerable<Product> Products { get; set; } = Enumerable.Empty<Product>();
+    public IStoreRepository Repository => Service;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var category = await Repository.Categories.FirstOrDefaultAsync(c => c.CategoryID == CategoryID);
+        if (category != null)
+        {
+            CategoryName = category.Name;
+            Products = await Repository.Products
+                        .Where(p => p.CategoryID == CategoryID)
+                        .ToListAsync();
+        }
+    }
+}
