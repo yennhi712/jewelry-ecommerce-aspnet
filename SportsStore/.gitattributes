@@ -4,7 +4,7 @@
 # JavaScript
 *.js linguist-language=JavaScript
 
-# HTML / Razor
+# Razor / HTML
 *.cshtml linguist-language=HTML
 *.razor linguist-language=Razor
 
