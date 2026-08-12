@@ -15,7 +15,7 @@ namespace SportsStore.Infrastructure
         public PageLinkTagHelper(IUrlHelperFactory helperFactory)
         {
             urlHelperFactory = helperFactory;
-        }
+        }   
 
         [ViewContext]
         [HtmlAttributeNotBound]

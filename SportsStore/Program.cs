@@ -39,6 +39,7 @@ builder.Services.AddDbContextFactory<StoreDbContext>(opts =>
 // Repository EF
 builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();
 builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
+builder.Configuration.GetConnectionString("DefaultConnection");
 
 // --- Database cho Identity ---
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
@@ -73,8 +74,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddHttpContextAccessor();
+
 // ✅ Đăng ký BankService để CartModel có thể sử dụng
 builder.Services.AddScoped<IBankService, BankService>();
+
+builder.Services.AddSingleton<IBotService, SimpleBotService>();
+builder.Services.AddSignalR();
 
 
 // ------------------ BUILD APP ------------------
@@ -126,6 +133,8 @@ app.MapControllerRoute(
     name: "tintuc",
     pattern: "TinTuc",
     defaults: new { controller = "TinTuc", action = "Index" });
+
+app.MapHub<ChatHub>("/chathub");
 
 // Razor Pages + Blazor
 app.MapRazorPages();

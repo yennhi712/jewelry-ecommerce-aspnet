@@ -116,9 +116,6 @@
 
         <div class="action-buttons">
             <a href="@Url.Action("EditAccount", "CustomerAccount", new { id = Model.IDCus })" class="btn-edit">✏️ Chỉnh sửa</a>
-            <a href="@Url.Action("DeleteAccount", "CustomerAccount", new { id = Model.IDCus })"
-               class="btn-delete"
-               onclick="return confirm('Bạn có chắc muốn xóa tài khoản này không?');">🗑️ Xóa tài khoản</a>
         </div>
     </div>
 }

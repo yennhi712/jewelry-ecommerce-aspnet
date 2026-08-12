@@ -13,7 +13,7 @@ namespace SportsStore.Models
         public DbSet<Order> Orders { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CartLine> CartLines { get; set; }
-
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -30,6 +30,8 @@ namespace SportsStore.Models
                 .WithMany(o => o.Lines)
                 .HasForeignKey(cl => cl.OrderID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            
         }
     }
 }

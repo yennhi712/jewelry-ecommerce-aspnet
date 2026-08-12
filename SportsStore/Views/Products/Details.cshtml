@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = Model.Name;
-    var otherProducts = ViewBag.OtherProducts as List<SportsStore.Models.Product> ?? new List<SportsStore.Models.Product>();
+    var otherProducts = (ViewBag.OtherProducts as IEnumerable<SportsStore.Models.Product>)?.ToList() ?? new List<SportsStore.Models.Product>();
 }
 
 <div class="container py-5">
@@ -22,21 +22,38 @@
 
             <h3 class="text-danger fw-bold mb-4">@Model.Price.ToString("N0") ₫</h3>
 
-            <!-- Nút thêm vào giỏ hàng -->
-            <form id="addToCartForm" method="post">
-                <input type="hidden" name="productId" value="@Model.ProductID" />
-                <button type="submit" class="btn btn-outline-dark btn-lg">
-                    <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
-                </button>
-            </form>
+            @if (Model.Quantity == 0)
+            {
+                <!-- Nếu hết hàng thì chỉ hiện thông báo -->
+                <div class="alert alert-danger fw-bold">
+                    Sản phẩm này đã hết hàng
+                </div>
+            }
+            else
+            {
+                <!-- Không còn size – chỉ còn nút mua -->
+                <p class="text-muted mb-3">
+                    <b>Phân loại:</b> @Model.Category?.Name
+                </p>
 
-            <!-- Nút mua ngay -->
-            <form method="post" asp-page="/Cart" asp-page-handler="BuyNow" class="mt-2">
-                <input type="hidden" name="productId" value="@Model.ProductID" />
-                <button type="submit" class="btn btn-gold btn-lg">
-                    <i class="fa-solid fa-bolt"></i> Mua ngay
-                </button>
-            </form>
+                <!-- Nút thêm vào giỏ hàng -->
+                <form id="addToCartForm" method="post">
+                    <input type="hidden" name="productId" value="@Model.ProductID" />
+
+                    <button type="submit" class="btn btn-outline-dark btn-lg">
+                        <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
+                    </button>
+                </form>
+
+                <!-- Nút mua ngay -->
+                <form id="buyNowForm" method="post" asp-page="/Cart" asp-page-handler="BuyNow" class="mt-2">
+                    <input type="hidden" name="productId" value="@Model.ProductID" />
+
+                    <button type="submit" class="btn btn-gold btn-lg">
+                        <i class="fa-solid fa-bolt"></i> Mua ngay
+                    </button>
+                </form>
+            }
 
             <a asp-action="Index" class="btn btn-link text-decoration-none mt-3">
                 <i class="fa-solid fa-arrow-left"></i> Quay lại sản phẩm
@@ -73,29 +90,37 @@
 
 @section Scripts {
     <script>
-        document.getElementById("addToCartForm").addEventListener("submit", function(e) {
+
+        // Add to Cart
+        document.getElementById("addToCartForm").addEventListener("submit", function (e) {
             e.preventDefault();
+
             const formData = new FormData(this);
 
             fetch("/Cart?handler=Add", {
                 method: "POST",
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.loginRequired) {
-                    alert("❗ Bạn phải đăng nhập trước khi thêm vào giỏ hàng!");
-                    window.location.href = data.loginUrl || "/CustomerAccount/Login";
-                    return;
-                }
+                .then(res => res.json())
+                .then(data => {
+                    if (data.loginRequired) {
+                        alert("Bạn phải đăng nhập trước khi thêm vào giỏ hàng!");
+                        window.location.href = data.loginUrl || "/CustomerAccount/Login";
+                        return;
+                    }
 
-                if (data.success) {
-                    alert("🛒 Đã thêm sản phẩm vào giỏ hàng!");
-                } else {
-                    alert("Có lỗi khi thêm sản phẩm!");
-                }
-            })
-            .catch(() => alert("Không thể kết nối máy chủ!"));
+                    if (data.success) {
+                        alert("Đã thêm sản phẩm vào giỏ hàng!");
+                    } else {
+                        alert("Có lỗi khi thêm sản phẩm!");
+                    }
+                })
+                .catch(() => alert("Không thể kết nối máy chủ!"));
+        });
+
+        // Buy Now (không cần size)
+        document.getElementById("buyNowForm").addEventListener("submit", function (e) {
+            // Không cần validation size nữa
         });
     </script>
 }

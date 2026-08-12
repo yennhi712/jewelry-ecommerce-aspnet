@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportsStore.Models;
-
+[Authorize(Roles = "Admin")]
 public class AdminUsersController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;

@@ -1,11 +1,17 @@
 ﻿@page "/admin/orders"
 @inherits OwningComponentBase<IOrderRepository>
+@using OfficeOpenXml
+@using OfficeOpenXml.Style
 @using System.Linq
+@inject NavigationManager NavigationManager
+
 <div class="container mt-3">
     <h2>Quản lý đơn hàng</h2>
-    <button class="btn btn-success mb-3">
-        Xuất Excel
+    <button class="btn btn-success mb-3" @onclick="DownloadExcel">
+        📥 Xuất Excel
     </button>
+
+
 
 
     @if (IsLoading)
@@ -38,14 +44,18 @@
             <OrderTable TableTitle="Đơn hàng chưa giao"
                         Orders="UnshippedOrders"
                         ButtonLabel="✓ Đánh dấu đã giao"
+                        ShowShipped="false"
                         OrderSelected="ShipOrder" />
+
         }
         else
         {
             <OrderTable TableTitle="Đơn hàng đã giao"
                         Orders="ShippedOrders"
                         ButtonLabel="↶ Quay lại chưa giao"
+                        ShowShipped="true"
                         OrderSelected="ResetOrder" />
+
         }
 
         <button class="btn btn-info mt-3" @onclick="LoadOrders" disabled="@IsLoading">🔄 Làm mới dữ liệu</button>
@@ -130,4 +140,74 @@
             StateHasChanged();
         }
     }
+    [Inject] IWebHostEnvironment WebHostEnv { get; set; }
+    [Inject] IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    public async Task ExportExcel()
+    {
+        try
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // FIX LỖI LICENSE
+
+            var orders = AllOrders.ToList();
+
+            string folder = Path.Combine(WebHostEnv.WebRootPath, "exports");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            string filePath = Path.Combine(folder, $"Orders_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+
+            using (var package = new ExcelPackage())
+            {
+                var ws = package.Workbook.Worksheets.Add("Orders");
+
+                // Header
+                ws.Cells[1, 1].Value = "OrderID";
+                ws.Cells[1, 2].Value = "Khách hàng";
+                ws.Cells[1, 3].Value = "Điện thoại";
+                ws.Cells[1, 4].Value = "Địa chỉ";
+                ws.Cells[1, 5].Value = "Tổng tiền";
+                ws.Cells[1, 6].Value = "Trạng thái";
+
+                int row = 2;
+
+                foreach (var o in orders)
+                {
+                    ws.Cells[row, 1].Value = o.OrderID;
+                    ws.Cells[row, 2].Value = o.Name;
+                    ws.Cells[row, 3].Value = o.Phone;
+
+                    ws.Cells[row, 4].Value =
+                        o.DeliveryType == "delivery"
+                        ? $"{o.AddressDetail}, {o.Ward}, {o.District}, {o.Province}"
+                        : $"{o.Store} ({o.City})";
+
+                    ws.Cells[row, 5].Value = o.TotalPrice;
+                    ws.Cells[row, 6].Value = o.Shipped ? "Đã giao" : "Chưa giao";
+
+                    row++;
+                }
+
+                ws.Cells.AutoFitColumns();
+                package.SaveAs(new FileInfo(filePath));
+            }
+
+            var context = HttpContextAccessor.HttpContext;
+            var response = context.Response;
+
+            response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            response.Headers.Add("Content-Disposition", $"attachment; filename=orders.xlsx");
+
+            await response.SendFileAsync(filePath);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Lỗi xuất Excel: {ex.Message}";
+        }
+    }
+    private async Task DownloadExcel()
+    {
+        NavigationManager.NavigateTo("/api/export/orders", true);
+    }
+
 }

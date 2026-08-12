@@ -112,8 +112,15 @@ namespace SportsStore.Models
                 if (order != null)
                 {
                     order.Shipped = shipped;
+
+                    // ⭐ GÁN NGÀY GIAO NẾU ĐÃ GIAO
+                    if (shipped)
+                        order.ShippedDate = DateTime.Now;
+                    else
+                        order.ShippedDate = null;   // ⭐ Reset khi chuyển lại trạng thái “Chưa giao”
+
                     context.SaveChanges();
-                    Console.WriteLine($"[v0] Order {orderId} Shipped status updated to {shipped}");
+                    Console.WriteLine($"[Updated] Order {orderId} shipped={shipped}, shippedDate={order.ShippedDate}");
                 }
             }
             catch (Exception ex)
@@ -122,5 +129,6 @@ namespace SportsStore.Models
                 throw;
             }
         }
+
     }
 }

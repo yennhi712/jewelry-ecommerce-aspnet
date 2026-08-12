@@ -4,6 +4,11 @@
 
 <h3 class="mb-3" style="color:#6b4e16;">Quản lý phân loại sản phẩm</h3>
 
+<NavLink class="btn btn-sm mt-3" style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+         href="/admin/categories/create">
+    <i class="bi bi-plus-circle"></i> Thêm phân loại mới
+</NavLink>
+<p></p>
 @if (CategoryData == null)
 {
     <div class="alert alert-info">Đang tải dữ liệu...</div>
@@ -56,10 +61,7 @@ else
         </tbody>
     </table>
 
-    <NavLink class="btn btn-sm mt-3" style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
-             href="/admin/categories/create">
-        <i class="bi bi-plus-circle"></i> Thêm phân loại mới
-    </NavLink>
+ 
 }
 
 @code {

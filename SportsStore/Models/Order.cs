@@ -35,6 +35,10 @@ namespace SportsStore.Models
         public string? Ward { get; set; }
         [StringLength(200)]
         public string? AddressDetail { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime? ShippedDate { get; set; }
+
 
         // Nhận tại cửa hàng
         [StringLength(50)]

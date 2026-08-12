@@ -6,7 +6,7 @@ namespace SportsStore.Models
     public static class IdentitySeedData
     {
         private const string adminUser = "Admin";
-        private const string adminPassword = "Secret123$";
+        private const string adminPassword = "Admin123";
 
         public static async Task EnsurePopulated(IApplicationBuilder app)
         {
@@ -31,7 +31,6 @@ namespace SportsStore.Models
             }
 
             // ✅ Tạo user Admin mặc định nếu chưa có
-            // ✅ Tạo user Admin mặc định nếu chưa có
             var admin = await userManager.FindByNameAsync(adminUser);
             if (admin == null)
             {
@@ -41,15 +40,18 @@ namespace SportsStore.Models
                     Email = "admin@example.com",
                     FullName = "Administrator",
                     Address = "Head Office",
-                    Role = "Admin",
                     EmailConfirmed = true
                 };
 
                 var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded)
+                {
                     await userManager.AddToRoleAsync(admin, "Admin");
+                }
                 else
+                {
                     Console.WriteLine($"[SeedData] Failed to create Admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                }
             }
             else if (!await userManager.IsInRoleAsync(admin, "Admin"))
             {
@@ -62,19 +64,33 @@ namespace SportsStore.Models
             {
                 customerUser = new ApplicationUser
                 {
-                    UserName = "Customer1",
-                    Email = "customer1@example.com",
-                    FullName = "Khách hàng mẫu",
+                    UserName = "YenNhi",
+                    Email = "yen.nhii0712@gmail.com",
+                    FullName = "Nguyễn Thị Yến Nhi",
                     Address = "TP. Hồ Chí Minh",
-                    Role = "Customer",
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(customerUser, "1234"); // mật khẩu đơn giản
+                var result = await userManager.CreateAsync(customerUser, "1234");
                 if (result.Succeeded)
+                {
                     await userManager.AddToRoleAsync(customerUser, "Customer");
+
+                    // Verify the role was actually added
+                    var roles_assigned = await userManager.GetRolesAsync(customerUser);
+                    if (!roles_assigned.Contains("Customer"))
+                    {
+                        Console.WriteLine($"[SeedData] WARNING: Failed to assign Customer role to Customer1");
+                    }
+                }
                 else
+                {
                     Console.WriteLine($"[SeedData] Failed to create Customer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                }
+            }
+            else if (!await userManager.IsInRoleAsync(customerUser, "Customer"))
+            {
+                await userManager.AddToRoleAsync(customerUser, "Customer");
             }
         }
     }
