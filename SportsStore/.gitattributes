@@ -1,7 +1,14 @@
+# Main programming languages
 *.cs linguist-language=C#
 *.js linguist-language=JavaScript
-*.cshtml linguist-language=HTML
-*.razor linguist-language=Razor
-*.scss linguist-language=SCSS
-*.css linguist-language=CSS
-*.sql linguist-language=SQL
+
+# Web files
+*.cshtml linguist-vendored
+*.razor linguist-vendored
+
+# Styling
+*.scss linguist-vendored
+*.css linguist-vendored
+
+# Database
+*.sql linguist-vendored
