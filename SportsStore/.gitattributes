@@ -1,0 +1,7 @@
+*.cs linguist-language=C#
+*.js linguist-language=JavaScript
+*.cshtml linguist-language=HTML
+*.razor linguist-language=Razor
+*.scss linguist-language=SCSS
+*.css linguist-language=CSS
+*.sql linguist-language=SQL
