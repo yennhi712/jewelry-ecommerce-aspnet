@@ -4,7 +4,10 @@
 # JavaScript
 *.js linguist-language=JavaScript
 
-# Razor / HTML
+# HTML
+*.html linguist-language=HTML
+
+# Razor
 *.cshtml linguist-language=HTML
 *.razor linguist-language=Razor
 
